@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
 const userModel = require("./models/user");
+const postModel = require("./models/post");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -19,12 +20,12 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-  res.cookie("token","")
-  res.redirect("/")
+  res.cookie("token", "");
+  res.redirect("/");
 });
 
 app.post("/login", async (req, res) => {
-  let { email,password } = req.body;
+  let { email, password } = req.body;
   let user = await userModel.findOne({ email });
   if (!user) {
     return res.status(500).send("User Not Found");
@@ -32,13 +33,11 @@ app.post("/login", async (req, res) => {
   bcrypt.compare(password, user.password, function (err, result) {
     if (!result) {
       return res.status(500).send("Password is wrong");
-      
     } else {
-      jwt.sign({ user:user.userName, email }, "shhhh", function (err, token) {
+      jwt.sign({ user: user.userName, email }, "shhhh", function (err, token) {
         res.cookie("token", token);
-        res.send("YOU CAN LOGIN")
+        res.send("YOU CAN LOGIN");
       });
-     
     }
   });
 });
@@ -66,4 +65,16 @@ app.post("/create", async (req, res) => {
   });
 });
 
+function isLoggedIn(req, res, next) {
+  if (req.cookies.token === "") {
+    res.send("You Must Login First");
+  }
+  let user = jwt.verify(req.cookies.token, "shhhh");
+  req.user = user;
+  next();
+}
+app.get("/profile",isLoggedIn, (req, res) => {
+  console.log(req.user)
+  res.redirect('/')
+});
 app.listen(3000);

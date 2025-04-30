@@ -28,8 +28,11 @@
         <p><%=post.content%></p>
         <footer class="blockquote-footer"><%=user.name %> </footer>
       </blockquote>
-      <a   class="btn btn-primary mx-2 my-2">Like</a>
-      <a   class="btn btn-black mx-2 my-2">Edit</a>
+      <div class="mx-2 my-2">
+      <a  href="/like/<%=post._id%>" class="btn btn-primary "><%=post.likes.indexOf(user._id)===-1?"Like":"Unlike"%></a>
+      <h7>-<%=post.likes.length%> likes</h7>
+      </div>
+      <a  href="/edit/<%=post._id%>" class="btn btn-dark mx-2 my-2">Edit</a>
     </div>
   </div>
  
